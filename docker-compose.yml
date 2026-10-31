@@ -1,0 +1,31 @@
+# Prompt (SEED.md): local stack for opensheet-ai.
+# `docker compose up --build` -> web on :5173, agents API on :8000.
+services:
+  agents:
+    build:
+      context: ./packages/agents
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OPENSHEET_LLM_PROVIDER: ${OPENSHEET_LLM_PROVIDER:-stub}
+      OPENSHEET_CORS_ORIGINS: ${OPENSHEET_CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: ./packages
+      dockerfile: web/Dockerfile
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    depends_on:
+      agents:
+        condition: service_healthy

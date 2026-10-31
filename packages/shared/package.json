@@ -1,0 +1,8 @@
+{
+  "name": "@opensheet/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./types/spreadsheet_schema.ts",
+  "exports": { ".": "./types/spreadsheet_schema.ts" }
+}
